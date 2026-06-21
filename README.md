@@ -391,6 +391,7 @@ OLE DB Destination : Stage_EmailAddress
 <img width="850" height="371" alt="image" src="https://github.com/user-attachments/assets/5dac3b69-b46d-4aaf-b7a8-2286fea4117a" />
 
 
+
 ```sql
 SELECT BusinessEntityID, EmailAddressID, EmailAddress, rowguid, ModifiedDate 
 FROM Person.EmailAddress
@@ -484,6 +485,10 @@ TRUNCATE TABLE Stage_EmailAddress;
 ---
 
 # First Run
+
+<img width="671" height="519" alt="image" src="https://github.com/user-attachments/assets/1ec3d673-20be-4ef4-9be4-e107b4a6ceaa" />
+
+
 
 ```
 Source: 19972 rows
