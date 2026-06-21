@@ -564,7 +564,6 @@ Package Success
                   Next Incremental Load
 ```
 
-<img width="816" height="818" alt="image" src="https://github.com/user-attachments/assets/967c194d-6797-4bf8-8606-761f7fcbd029" />
 
 For **Execute SQL Task** in SSIS, the **Connection Type** should be **OLE DB**, and the provider should match your SQL Server version.
 
@@ -584,6 +583,8 @@ For **Execute SQL Task** in SSIS, the **Connection Type** should be **OLE DB**, 
 | Database       | `DataWarehouse`                                            |
 
 Click **Test Connection** → **OK**
+
+<img width="816" height="818" alt="image" src="https://github.com/user-attachments/assets/b9482c5e-fa97-464c-abdb-73236177cf34" />
 
 ---
 
