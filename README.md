@@ -295,13 +295,8 @@ CREATE TABLE config_table
     LastUpdatedValue DATETIME
 );
 
-INSERT INTO config_table
-VALUES
-(
-'EmailAddress',
-'ModifiedDate',
-'1900-01-01'
-);
+INSERT INTO config_table 
+VALUES ('EmailAddress', 'ModifiedDate', '1900-01-01');
 ```
 
 ---
@@ -312,25 +307,17 @@ Whenever any business column changes, ModifiedDate should update automatically.
 
 ```sql
 CREATE TRIGGER TR_EmailAddress_ModifiedDate
-
 ON Person.EmailAddress
-
 AFTER UPDATE
-
 AS
-
 BEGIN
 
 SET NOCOUNT ON;
 
 UPDATE E
-
 SET ModifiedDate=GETDATE()
-
 FROM Person.EmailAddress E
-
 INNER JOIN inserted I
-
 ON E.EmailAddressID=I.EmailAddressID;
 
 END;
@@ -352,13 +339,9 @@ END;
 ```
 Execute SQL Task
 (Get LastUpdatedValue)
-
 ↓
-
 Data Flow Task
-
 ↓
-
 Execute SQL Task
 (MERGE + Audit + Config)
 ```
@@ -371,10 +354,8 @@ Execute SQL Task
 
 ```sql
 SELECT LastUpdatedValue
-
 FROM config_table
-
-WHERE TableName='EmailAddress'
+WHERE TableName ='EmailAddress'
 ```
 
 ### Properties
@@ -412,16 +393,8 @@ Stage_EmailAddress
 # Step 11 : OLE DB Source
 
 ```sql
-SELECT
-
-BusinessEntityID,
-EmailAddressID,
-EmailAddress,
-rowguid,
-ModifiedDate
-
+SELECT BusinessEntityID, EmailAddressID, EmailAddress, rowguid, ModifiedDate 
 FROM Person.EmailAddress
-
 WHERE ModifiedDate > ?
 ```
 
@@ -450,90 +423,29 @@ Table or View Fast Load
 # Step 13 : MERGE
 
 ```sql
-DECLARE @Audit TABLE
-(
-ActionType VARCHAR(20)
-);
+DECLARE @Audit TABLE (ActionType VARCHAR(20));
 
 MERGE dbo.EmailAddress AS Target
-
 USING dbo.Stage_EmailAddress AS Source
-
 ON Target.EmailAddressID=Source.EmailAddressID
-
 WHEN MATCHED
-
 AND
-
 (
-
-ISNULL(Target.EmailAddress,'')
-<>
-ISNULL(Source.EmailAddress,'')
-
+ISNULL(Target.EmailAddress,'') <> ISNULL(Source.EmailAddress,'')
 OR
-
-ISNULL(Target.ModifiedDate,'1900-01-01')
-<>
-ISNULL(Source.ModifiedDate,'1900-01-01')
-
+ISNULL(Target.ModifiedDate,'1900-01-01') <> ISNULL(Source.ModifiedDate,'1900-01-01')
 )
 
-THEN
-
-UPDATE
-
-SET
-
-Target.BusinessEntityID=Source.BusinessEntityID,
-
-Target.EmailAddress=Source.EmailAddress,
-
-Target.rowguid=Source.rowguid,
-
-Target.ModifiedDate=Source.ModifiedDate
+THEN UPDATE SET
+Target.BusinessEntityID = Source.BusinessEntityID,
+Target.EmailAddress = Source.EmailAddress,
+Target.rowguid = Source.rowguid,
+Target.ModifiedDate = Source.ModifiedDate
 
 WHEN NOT MATCHED
-
-THEN
-
-INSERT
-
-(
-
-BusinessEntityID,
-
-EmailAddressID,
-
-EmailAddress,
-
-rowguid,
-
-ModifiedDate
-
-)
-
-VALUES
-
-(
-
-Source.BusinessEntityID,
-
-Source.EmailAddressID,
-
-Source.EmailAddress,
-
-Source.rowguid,
-
-Source.ModifiedDate
-
-)
-
-OUTPUT
-
-$action
-
-INTO @Audit;
+THEN INSERT (BusinessEntityID, EmailAddressID, EmailAddress, rowguid, ModifiedDate) 
+VALUES ( Source.BusinessEntityID, Source.EmailAddressID, Source.EmailAddress, Source.rowguid, Source.ModifiedDate)
+OUTPUT $action INTO @Audit;
 ```
 
 ---
@@ -542,68 +454,19 @@ INTO @Audit;
 
 ```sql
 DECLARE @Inserted INT;
-
 DECLARE @Updated INT;
 
 SELECT
-
 @Inserted=COUNT(*)
-
 FROM @Audit
-
 WHERE ActionType='INSERT';
-
 SELECT
-
 @Updated=COUNT(*)
-
 FROM @Audit
-
 WHERE ActionType='UPDATE';
 
-INSERT INTO audit_log
-
-(
-
-PackageName,
-
-TableName,
-
-RecordsInserted,
-
-RecordsUpdated,
-
-RecordsDeleted,
-
-StartTime,
-
-EndTime,
-
-Status
-
-)
-
-VALUES
-
-(
-
-'IncrementalLoad.dtsx',
-
-'EmailAddress',
-
-@Inserted,
-
-@Updated,
-
-0,
-
-GETDATE(),
-
-GETDATE(),
-
-'Success'
-
-);
+INSERT INTO audit_log (PackageName, TableName, RecordsInserted, RecordsUpdated, RecordsDeleted, StartTime, EndTime, Status)
+VALUES ( 'IncrementalLoad.dtsx', 'EmailAddress', @Inserted, @Updated, 0, GETDATE(), GETDATE(), 'Success' );
 ```
 
 ---
@@ -612,17 +475,7 @@ GETDATE(),
 
 ```sql
 UPDATE config_table
-
-SET LastUpdatedValue=
-
-(
-
-SELECT MAX(ModifiedDate)
-
-FROM dbo.EmailAddress
-
-)
-
+SET LastUpdatedValue = (SELECT MAX(ModifiedDate) FROM dbo.EmailAddress)
 WHERE TableName='EmailAddress';
 ```
 
@@ -776,42 +629,24 @@ Stage truncated
 
 ```
 AdventureWorks2019
-
 ↓
-
 Trigger updates ModifiedDate automatically
-
 ↓
-
 SSIS reads LastUpdatedValue
-
 ↓
-
 OLE DB Source
-
 WHERE ModifiedDate > LastUpdatedValue
-
 ↓
-
 Stage_EmailAddress
-
 ↓
-
 MERGE
-
 ├── Insert New Records
 ├── Update Existing Records
-
 ↓
-
 audit_log
-
 ↓
-
 config_table
-
 ↓
-
 TRUNCATE Stage_EmailAddress
 ```
 
