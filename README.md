@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-Based on the provided YouTube transcript, the primary objective is to implement an **Incremental ETL Process** that loads only **new and modified records** from the source system to the destination system using **LastUpdated/ModifiedDateTime** fields instead of loading the entire table every time. 
+To implement an **Incremental ETL Process** that loads only **new and modified records** from the source system to the destination system using **LastUpdated/ModifiedDateTime** fields instead of loading the entire table every time. 
 
 ### Key Points
 
@@ -564,4 +564,3 @@ Package Success
                   Next Incremental Load
 ```
 
-This design represents a **real-time enterprise SSIS incremental ETL framework** using **LastUpdated/ModifiedDate**, **variables**, **project parameters**, **metadata tables**, **audit tables**, **dynamic SQL**, **MERGE logic**, and **Mermaid/flow diagrams**, matching the architecture and concepts described in the transcript. 
