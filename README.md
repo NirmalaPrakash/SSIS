@@ -564,3 +564,140 @@ Package Success
                   Next Incremental Load
 ```
 
+<img width="816" height="818" alt="image" src="https://github.com/user-attachments/assets/967c194d-6797-4bf8-8606-761f7fcbd029" />
+
+For **Execute SQL Task** in SSIS, the **Connection Type** should be **OLE DB**, and the provider should match your SQL Server version.
+
+## For SQL Server 2019 (Recommended)
+
+✅ **Native OLE DB\Microsoft OLE DB Provider for SQL Server**
+
+---
+
+## Connection Manager
+
+| Setting        | Value                                                      |
+| -------------- | ---------------------------------------------------------- |
+| Provider       | **Native OLE DB\Microsoft OLE DB Provider for SQL Server** |
+| Server Name    | `NirmalaPrakash`                                           |
+| Authentication | Windows Authentication                                     |
+| Database       | `DataWarehouse`                                            |
+
+Click **Test Connection** → **OK**
+
+---
+
+# Execute SQL Task Settings
+
+### General
+
+| Property       | Value                                               |
+| -------------- | --------------------------------------------------- |
+| ConnectionType | OLE DB                                              |
+| Connection     | DataWarehouse Connection Manager                    |
+| SQLSourceType  | Direct Input                                        |
+| ResultSet      | None (for INSERT/UPDATE) or Single Row (for SELECT) |
+
+---
+
+# If Running SELECT Query
+
+Example:
+
+```sql
+SELECT DATEADD(SECOND,1,LastUpdatedValue)
+FROM config_table
+WHERE TableName='[Person].[EmailAddress]'
+```
+
+### ResultSet
+
+```
+Single Row
+```
+
+### Result Set Tab
+
+| Result Name | Variable               |
+| ----------- | ---------------------- |
+| 0           | User::LastUpdatedValue |
+
+---
+
+# If Running INSERT Query
+
+```sql
+INSERT INTO audit_log
+(
+    PackageName,
+    TableName,
+    RecordsInserted,
+    RecordsUpdated,
+    StartTime
+)
+VALUES
+(
+    ?, ?, ?, ?, GETDATE()
+)
+```
+
+### ResultSet
+
+```
+None
+```
+
+### Parameter Mapping
+
+| Variable              | Data Type | Parameter Name |
+| --------------------- | --------- | -------------- |
+| User::PackageName     | VARCHAR   | 0              |
+| User::TableName       | VARCHAR   | 1              |
+| User::RecordsInserted | LONG      | 2              |
+| User::RecordsUpdated  | LONG      | 3              |
+
+---
+
+# If Running UPDATE Query
+
+```sql
+UPDATE config_table
+SET LastUpdatedValue =
+(
+    SELECT MAX(ModifiedDate)
+    FROM Person.EmailAddress
+)
+WHERE TableName='[Person].[EmailAddress]'
+```
+
+### ResultSet
+
+```
+None
+```
+
+No parameter mapping is required if there are no `?` placeholders.
+
+---
+
+# Common Providers
+
+| Provider                                                   | Recommendation               |
+| ---------------------------------------------------------- | ---------------------------- |
+| **Native OLE DB\Microsoft OLE DB Provider for SQL Server** | ⭐⭐⭐⭐⭐ Recommended            |
+| SQL Server Native Client 11.0                              | Supported but older          |
+| .NET Providers\SqlClient Data Provider                     | Use only for ADO.NET tasks   |
+| ODBC Driver                                                | Use only if ODBC is required |
+
+---
+
+## For Your Incremental Load Project
+
+Use the **same OLE DB Connection Manager (`DataWarehouse`)** for:
+
+* ✅ Execute SQL Task (Get LastUpdatedValue)
+* ✅ Execute SQL Task (Insert Audit Log)
+* ✅ Execute SQL Task (Update Config Table)
+* ✅ OLE DB Destination
+* ✅ Lookup Transformation (Destination Table)
+
