@@ -387,7 +387,8 @@ OLE DB Destination : Stage_EmailAddress
 # Step 11 : OLE DB Source
 
 <img width="847" height="813" alt="image" src="https://github.com/user-attachments/assets/3b365724-1b03-4791-a655-20f7b43a1edc" />
-<img width="891" height="371" alt="image" src="https://github.com/user-attachments/assets/5dac3b69-b46d-4aaf-b7a8-2286fea4117a" />
+
+<img width="850" height="371" alt="image" src="https://github.com/user-attachments/assets/5dac3b69-b46d-4aaf-b7a8-2286fea4117a" />
 
 
 ```sql
