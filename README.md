@@ -35,7 +35,7 @@ To implement an **Incremental ETL Process** that loads only **new and modified r
                                |
                                |
                                v
-        WHERE ModifiedDate > LastLoadDate
+                 WHERE ModifiedDate > LastLoadDate
                                |
                                |
                                v
@@ -109,7 +109,7 @@ I --> J[Next ETL Execution]
              Get LastLoadDate From Metadata
                            │
                            ▼
-          Filter Changed Records Only
+              Filter Changed Records Only
                            │
                            ▼
                  Lookup Business Key
@@ -378,12 +378,8 @@ ResultSet = Single Row
 
 ```
 OLE DB Source
-
 ↓
-
-OLE DB Destination
-
-Stage_EmailAddress
+OLE DB Destination : Stage_EmailAddress
 ```
 
 ---
@@ -407,13 +403,8 @@ Parameter Mapping
 # Step 12 : OLE DB Destination
 
 ```
-Destination
-
-Stage_EmailAddress
-
-Data Access Mode
-
-Table or View Fast Load
+Destination: Stage_EmailAddress
+Data Access Mode: Table or View Fast Load
 ```
 
 ---
@@ -490,38 +481,19 @@ TRUNCATE TABLE Stage_EmailAddress;
 # First Run
 
 ```
-Source
-
-19972 rows
-
+Source: 19972 rows
 ↓
-
-Stage
-
-19972 rows
-
+Stage: 19972 rows
 ↓
-
 MERGE
-
-Inserted =19972
-
-Updated =0
-
+Inserted = 19972
+Updated = 0
 ↓
-
-audit_log
-
-19972 Inserted
-
+audit_log: 19972 Inserted
 ↓
-
 config_table
-
 LastUpdatedValue updated
-
 ↓
-
 Stage truncated
 ```
 
@@ -530,32 +502,16 @@ Stage truncated
 # Second Run (No Changes)
 
 ```
-Source
-
-0 rows
-
+Source: 0 rows
 ↓
-
-Stage
-
-0 rows
-
+Stage: 0 rows
 ↓
-
 MERGE
-
 Inserted=0
-
 Updated=0
-
 ↓
-
-audit_log
-
-0
-
+audit_log: 0
 ↓
-
 config_table unchanged
 ```
 
@@ -567,11 +523,8 @@ User executes
 
 ```sql
 UPDATE Person.EmailAddress
-
 SET
-
 EmailAddress='new@gmail.com'
-
 WHERE EmailAddressID=10;
 ```
 
@@ -584,40 +537,21 @@ ModifiedDate=GETDATE()
 Result
 
 ```
-Source
-
-1 changed row
-
+Source: 1 changed row
 ↓
-
-Stage
-
-1 row
-
+Stage: 1 row
 ↓
-
 MERGE
-
 MATCHED
-
 ↓
-
 UPDATE
-
 ↓
-
 audit_log
-
 Inserted=0
-
 Updated=1
-
 ↓
-
 config_table updated
-
 ↓
-
 Stage truncated
 ```
 
